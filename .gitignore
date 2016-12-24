@@ -22,3 +22,4 @@ _testmain.go
 *.exe
 *.test
 *.prof
+proxy-http-status-code-only

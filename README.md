@@ -1,11 +1,15 @@
 # proxy-http-status-code-only
-A very simple Golang app to proxy an HTTP request and return only the HTTP status code
+A very simple Golang app to reverse proxy an HTTP request and return only the HTTP status code
 
 ###### Some apps don't have unauthenticated endpoints, and you want to check their HTTP Status Code without authentication. Put this app up in your private network, then expose it publically to be able to check the status codes of those endpoints publically, without anything else getting through.
 
 ## Usage:
 ```shell
 go run main.go -url http://localhost:5000 -serveaddress localhost:3000
+```
+or
+```shell
+docker run --rm --net host snarlysodboxer/proxy-http-status-code-only:latest -url http://localhost:5000 -serveaddress localhost:3000
 ```
 This will listen for requests on `localhost:3000` and proxy the request through to `http://localhost:5000` including the full URI, and respond with only the HTTP status code.
 
