@@ -1,7 +1,7 @@
 # proxy-http-status-code-only
 A very simple Golang app to reverse proxy an HTTP request but return only the HTTP status code
 
-###### Some apps don't have unauthenticated endpoints, and you want to check their HTTP Status Code without authentication. Put this app up in your private network, then expose it publically to be able to check the status codes of those endpoints publically, without anything else getting through.
+###### Some apps don't have unauthenticated endpoints, and you want to check their HTTP Status Code without authentication. Put this app up in your private network bypassing authentication, then expose it publically to be able to check the status codes of those endpoints publically, without anything else getting through.
 
 ## Usage:
 ```shell
