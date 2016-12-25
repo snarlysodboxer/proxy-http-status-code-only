@@ -1,30 +1,32 @@
 # proxy-http-status-code-only
 A very simple Golang app to reverse proxy an HTTP request but return only the HTTP status code
 
-###### Some apps don't have unauthenticated endpoints, and you want to check their HTTP Status Code without authentication. Put this app up in your private network bypassing authentication, then expose it publically to be able to check the status codes of those endpoints publically, without anything else getting through.
+###### Some apps don't have unauthenticated endpoints, and you want to check their HTTP Status Code without authentication. Put this app up in your private network bypassing authentication, then expose it publically to be able to check the status codes of a GET endpoint publically, without anything else getting through.
 
 ## Usage:
 ```shell
-go run main.go -url http://localhost:5000 -serveaddress localhost:3000
+go run main.go -check-url http://localhost:5000/my-app-endpoint -listen-url http://localhost:3000/status-code
 ```
 or
 ```shell
-docker run --rm --net host snarlysodboxer/proxy-http-status-code-only:latest -url http://localhost:5000 -serveaddress localhost:3000
+docker run --rm --net host snarlysodboxer/proxy-http-status-code-only:latest -check-url http://localhost:5000/my-app-endpoint -listen-url http://localhost:3000/status-code
 ```
-This will listen for requests on `localhost:3000` and proxy the request through to `http://localhost:5000` including the full URI, and respond with only the HTTP status code.
+This will listen for requests on `localhost:3000/status-code`, give a 404 for any URI other than `/status-code`, hit `http://localhost:5000/my-api-endpoint`, and respond with only the HTTP status code.
 
 ## Example:
 ```shell
-machine:~$ go run main.go -url http://www.google.com -serveaddress localhost:3000 &
+machine:~$ go run main.go -check-url http://www.google.com -listen-url http://localhost:3000 &
 machine:~$ curl http://localhost:3000/asdf
+404 page not found
 machine:~$
 machine:~$ curl -I http://localhost:3000/asdf
 HTTP/1.1 404 Not Found
 Date: Sat, 24 Dec 2016 21:03:45 GMT
 Content-Type: text/plain; charset=utf-8
-machine:~$ curl http://localhost:3000/robots.txt
 machine:~$
-machine:~$ curl -I http://localhost:3000/robots.txt
+machine:~$ curl http://localhost:3000/status-code
+machine:~$
+machine:~$ curl -I http://localhost:3000/status-code
 HTTP/1.1 200 OK
 Date: Sat, 24 Dec 2016 21:03:53 GMT
 Content-Type: text/plain; charset=utf-8

@@ -2,30 +2,33 @@ package main
 
 import (
 	"flag"
-	"fmt"
 	"log"
 	"net/http"
+	"net/url"
 )
 
 func main() {
-	var url = flag.String("url", "http://www.google.com", "URL to proxy status code from")
-	var serveAddress = flag.String("serveaddress", ":3000", "address to listen and serve upon")
+	var checkURL = flag.String("check-url", "http://www.google.com", "URL to proxy status code from")
+	var listenURL = flag.String("listen-url", "http://localhost:3000/status-code", "address to listen and serve upon")
 	flag.Parse()
-	log.Printf("Reverse proxying to %s", *url)
-	log.Printf("Listening on %s", *serveAddress)
+
+	parsedURL, err := url.Parse(*listenURL)
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("Reverse proxying status code from %s", *checkURL)
+	log.Printf("Listening on %s at %s", parsedURL.Host, parsedURL.Path)
 
 	mux := http.NewServeMux()
-	mux.HandleFunc("/", func(w http.ResponseWriter, req *http.Request) {
-		log.Printf("Received request URI %s", req.RequestURI)
-		newUri := fmt.Sprintf("%s%s", *url, req.RequestURI)
-		res, err := http.Get(newUri)
+	mux.HandleFunc(parsedURL.Path, func(w http.ResponseWriter, req *http.Request) {
+		res, err := http.Get(*checkURL)
 		if err != nil {
 			log.Println(err)
-			w.WriteHeader(404)
+			w.WriteHeader(500)
 		} else {
 			w.WriteHeader(res.StatusCode)
 		}
 	})
 
-	http.ListenAndServe(*serveAddress, mux)
+	http.ListenAndServe(parsedURL.Host, mux)
 }
