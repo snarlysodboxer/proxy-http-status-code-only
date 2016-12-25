@@ -12,6 +12,7 @@ or
 docker run --rm --net host snarlysodboxer/proxy-http-status-code-only:latest -check-url http://localhost:5000/my-app-endpoint -listen-url http://localhost:3000/status-code
 ```
 This will listen for requests on `localhost:3000/status-code`, give a 404 for any URI other than `/status-code`, hit `http://localhost:5000/my-api-endpoint`, and respond with only the HTTP status code.
+Be sure to set your check URI to an endpoint on your app that doesn't actually do anything, just returns a page. (To avoid attacks.)
 
 ## Example:
 ```shell
