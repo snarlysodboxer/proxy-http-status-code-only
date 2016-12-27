@@ -2,9 +2,11 @@ package main
 
 import (
 	"flag"
+	"github.com/didip/tollbooth"
 	"log"
 	"net/http"
 	"net/url"
+	"time"
 )
 
 func main() {
@@ -20,15 +22,20 @@ func main() {
 	log.Printf("Listening on %s at %s", parsedURL.Host, parsedURL.Path)
 
 	mux := http.NewServeMux()
-	mux.HandleFunc(parsedURL.Path, func(w http.ResponseWriter, req *http.Request) {
-		res, err := http.Get(*checkURL)
-		if err != nil {
-			log.Println(err)
-			w.WriteHeader(500)
-		} else {
-			w.WriteHeader(res.StatusCode)
-		}
-	})
+	mux.Handle(parsedURL.Path,
+		tollbooth.LimitFuncHandler(
+			tollbooth.NewLimiter(1, time.Second),
+			func(w http.ResponseWriter, req *http.Request) {
+				res, err := http.Get(*checkURL)
+				if err != nil {
+					log.Println(err)
+					w.WriteHeader(500)
+				} else {
+					w.WriteHeader(res.StatusCode)
+				}
+			},
+		),
+	)
 
 	http.ListenAndServe(parsedURL.Host, mux)
 }
