@@ -34,3 +34,8 @@ Date: Sat, 24 Dec 2016 21:03:53 GMT
 Content-Type: text/plain; charset=utf-8
 machine:~$
 ```
+
+## Other options
+* `-rate-limit` milliseconds at which to limit the rate of requests, defaults to 1000
+* `-burst-limit` quantity of requests to allow in bursts, defaults to 10
+
