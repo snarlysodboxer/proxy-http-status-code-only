@@ -16,7 +16,7 @@ Be sure to set your check-url path to an endpoint on your app that doesn't actua
 
 ## Example:
 ```shell
-machine:~$ docker run --rm -p 3000:3000 snarlysodboxer/proxy-http-status-code-only:latest -check-url http://www.google.com/robots.txt -listen-url http://0.0.0.0:3000/status-code
+machine:~$ docker run -d -p 3000:3000 snarlysodboxer/proxy-http-status-code-only:latest -check-url http://www.google.com/robots.txt -listen-url http://0.0.0.0:3000/status-code
 machine:~$
 machine:~$ curl http://localhost:3000/asdf
 404 page not found
