@@ -5,18 +5,19 @@ A very simple Golang app to reverse proxy an HTTP request but return only the HT
 
 ## Usage:
 ```shell
-go run main.go -check-url http://localhost:5000/my-app-endpoint -listen-url http://localhost:3000/status-code
+go run main.go -check-url http://localhost:5000/my-app-endpoint -listen-url http://localhost:3000
 ```
 or
 ```shell
-docker run --rm --net host snarlysodboxer/proxy-http-status-code-only:latest -check-url http://localhost:5000/my-app-endpoint -listen-url http://localhost:3000/status-code
+docker run --rm -p 3000:3000 snarlysodboxer/proxy-http-status-code-only:latest -check-url http://localhost:5000/my-app-endpoint -listen-url http://0.0.0.0:3000/status-code
 ```
-This will listen for requests on `localhost:3000/status-code`, give a 404 for any URI other than `/status-code`, hit `http://localhost:5000/my-api-endpoint`, and respond with only the HTTP status code.
-Be sure to set your check URI to an endpoint on your app that doesn't actually do anything, just returns a page. (To avoid attacks.)
+This will listen for GET requests on `localhost:3000/status-code`, give a 404 for any path other than `/status-code`, GET `http://localhost:5000/my-api-endpoint`, and respond with only the HTTP status code.
+Be sure to set your check-url path to an endpoint on your app that doesn't actually do anything, to avoid attacks.
 
 ## Example:
 ```shell
-machine:~$ go run main.go -check-url http://www.google.com -listen-url http://localhost:3000 &
+machine:~$ docker run --rm -p 3000:3000 snarlysodboxer/proxy-http-status-code-only:latest -check-url http://www.google.com/robots.txt -listen-url http://0.0.0.0:3000/status-code
+machine:~$
 machine:~$ curl http://localhost:3000/asdf
 404 page not found
 machine:~$

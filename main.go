@@ -18,14 +18,22 @@ func main() {
 	if err != nil {
 		log.Fatal(err)
 	}
+	path := "/"
+	if parsedURL.Path != "" {
+		path = parsedURL.Path
+	}
 	log.Printf("Reverse proxying status code from %s", *checkURL)
-	log.Printf("Listening on %s at %s", parsedURL.Host, parsedURL.Path)
+	log.Printf("Listening on %s at %s", parsedURL.Host, path)
 
 	mux := http.NewServeMux()
-	mux.Handle(parsedURL.Path,
+	mux.Handle(path,
 		tollbooth.LimitFuncHandler(
 			tollbooth.NewLimiter(1, time.Second),
 			func(w http.ResponseWriter, req *http.Request) {
+				if req.URL.Path != path {
+					http.NotFound(w, req)
+					return
+				}
 				res, err := http.Get(*checkURL)
 				if err != nil {
 					log.Println(err)
