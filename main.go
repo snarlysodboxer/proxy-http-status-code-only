@@ -38,6 +38,7 @@ func main() {
 					return
 				}
 				res, err := http.Get(*checkURL)
+				defer res.Body.Close()
 				if err != nil {
 					log.Println(err)
 					w.WriteHeader(500)

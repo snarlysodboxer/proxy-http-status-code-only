@@ -16,7 +16,7 @@ docker rmi temp-certs:latest
 
 docker build -t snarlysodboxer/proxy-http-status-code-only:latest .
 
-rm proxy-http-status-code-only
+rm -f proxy-http-status-code-only
 
 docker push snarlysodboxer/proxy-http-status-code-only:latest
 
