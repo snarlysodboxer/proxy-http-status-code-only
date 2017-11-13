@@ -6,6 +6,7 @@ import (
 	"log"
 	"net/http"
 	"net/url"
+	"strings"
 	"time"
 )
 
@@ -32,18 +33,25 @@ func main() {
 	mux.Handle(path,
 		tollbooth.LimitFuncHandler(
 			tollbooth.NewLimiter(*burstLimit, time.Duration(*rateLimit)*time.Millisecond),
-			func(w http.ResponseWriter, req *http.Request) {
-				if req.URL.Path != path {
-					http.NotFound(w, req)
+			func(responseWriter http.ResponseWriter, requestReader *http.Request) {
+				if requestReader.URL.Path != path {
+					http.NotFound(responseWriter, requestReader)
 					return
 				}
-				res, err := http.Get(*checkURL)
+				res := new(http.Response)
+				if requestReader.Method == "GET" {
+					res, err = http.Get(*checkURL)
+				} else if requestReader.Method == "POST" {
+					res, err = http.Post(*checkURL, "application/json", strings.NewReader(""))
+				} else {
+					log.Fatal("We currrently only support GET and POST")
+				}
 				defer res.Body.Close()
 				if err != nil {
 					log.Println(err)
-					w.WriteHeader(500)
+					responseWriter.WriteHeader(500)
 				} else {
-					w.WriteHeader(res.StatusCode)
+					responseWriter.WriteHeader(res.StatusCode)
 				}
 			},
 		),
